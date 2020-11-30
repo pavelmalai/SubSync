@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Microsoft.Win32;
 using SubSyncLib.Logic;
 using SubSyncLib.Providers;
 
@@ -39,19 +40,22 @@ namespace SubSyncLib
 
     public class Program
     {
+        private const string RegistryMenuName = "Folder\\shell\\SubSync";
+        public const string RegistryCommandName = "Folder\\shell\\SubSync\\command";
+
         public static void Main(string[] args)
         {
-            var settings = Arguments.Parse<SubSyncSettings>(args);
+            string folderName = null;
+            if (Environment.GetCommandLineArgs().Length > 1)
+            {
+                folderName = Environment.GetCommandLineArgs()[1];
+            }
 
-            //// ugly workaround for ending backslashes with single/double-quotes. Seem to be a bug in the dotnet!
-            //if (!string.IsNullOrEmpty(settings.Input) && (settings.Input.EndsWith("\"") || settings.Input.EndsWith("'")))
-            //{
-            //    settings.Input = settings.Input.Substring(0, settings.Input.Length - 1);
-            //}
+            var settings = Arguments.Parse<SubSyncSettings>(args);
 
             var subtitleExtensions = settings.SubtitleExt;
             var languages = settings.Languages;
-            var input = settings.Input;
+            var input = folderName;
 
             var version = GetVersion();
             var logger = new ConsoleLogger();
@@ -78,6 +82,8 @@ namespace SubSyncLib
                     logger.WriteLine("  Following folder and its subfolders being watched");
                     logger.WriteLine($"    @whi@{input} @gray@");
                     logger.WriteLine("");
+                    logger.WriteLine("  You may press @green@'r' @gray@ to register the SubSync in the windows folder context menu.");
+                    logger.WriteLine("  You may press @green@'u' @gray@ to unregister the SubSync from the windows folder context menu.");
                     logger.WriteLine("  You may press @green@'q' @gray@at any time to quit.");
                     logger.WriteLine("");
 
@@ -95,6 +101,19 @@ namespace SubSyncLib
                     ConsoleKeyInfo ck;
                     while ((ck = Console.ReadKey(true)).Key != ConsoleKey.Q)
                     {
+                        if (ck.Key == ConsoleKey.R)
+                        {
+
+                            RegisterOnContextMenu();
+                            Console.WriteLine("Context menu item registered!");
+                        }
+
+                        if (ck.Key == ConsoleKey.U)
+                        {
+                            UnregisterOnContextMenu();
+                            Console.WriteLine("Context menu item unregistered!");
+                        }
+
                         if (ck.Key == ConsoleKey.A)
                         {
                             mediaWatcher.SyncAll();
@@ -127,6 +146,61 @@ namespace SubSyncLib
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
             var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
             return fvi.FileVersion;
+        }
+
+        //Register the SubSync executable in the windows explorer context menu
+        private static void RegisterOnContextMenu()
+        {
+            RegistryKey regmenu = null;
+            RegistryKey regcmd = null;
+            string executable = AppContext.BaseDirectory + "SubSync.exe";
+            string menuCommand = $"\"{executable}\" \"%V\"";
+
+            try
+            {
+                regmenu = Registry.ClassesRoot.CreateSubKey(RegistryMenuName);
+                if (regmenu != null)
+                    regmenu.SetValue("", "SubSync");
+                regcmd = Registry.ClassesRoot.CreateSubKey(RegistryCommandName);
+                if (regcmd != null)
+                    regcmd.SetValue("", menuCommand);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            finally
+            {
+                if (regmenu != null)
+                    regmenu.Close();
+                if (regcmd != null)
+                    regcmd.Close();
+            }
+        }
+
+        //Unregister the SubSync executable from the windows explorer context menu
+        private static void UnregisterOnContextMenu()
+        {
+            try
+            {
+                RegistryKey reg = Registry.ClassesRoot.OpenSubKey(RegistryCommandName);
+                if (reg != null)
+                {
+                    reg.Close();
+                    Registry.ClassesRoot.DeleteSubKey(RegistryCommandName);
+                }
+                reg = Registry.ClassesRoot.OpenSubKey(RegistryMenuName);
+                if (reg != null)
+                {
+                    reg.Close();
+                    Registry.ClassesRoot.DeleteSubKey(RegistryMenuName);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
     }
 }
