@@ -1,5 +1,6 @@
 # Fork Description
 Added the option to add SubSync to the windows folder context menu
+![alt text](https://github.com/pavelmalai/SubSync/blob/master/SubSyncFolderContext.png)
 
 How to use:
 1) Run the SubSync.exe
@@ -9,7 +10,7 @@ How to use:
 //TODO
 - Add the option to specify a different language than the default one
 
-Original Description
+# Original Description
 # SubSync
 Automatically download subtitles for your movies
 
