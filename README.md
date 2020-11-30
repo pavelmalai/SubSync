@@ -1,3 +1,15 @@
+# Fork Description
+Added the option to add SubSync to the windows folder context menu
+
+How to use:
+1) Run the SubSync.exe
+2) Use the keys 'r' and 'u' to register/unregister the SubSYnc from the context menu
+3) Right click on a folder that contains the movies you want the subtitles for, and click SubSync, this will download the subs for the selected folder, recursively
+
+//TODO
+- Add the option to specify a different language than the default one
+
+Original Description
 # SubSync
 Automatically download subtitles for your movies
 
