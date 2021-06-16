@@ -1,5 +1,6 @@
 # Fork Description
 Added the option to add SubSync to the windows folder context menu
+
 ![alt text](https://github.com/pavelmalai/SubSync/blob/master/SubSyncFolderContext.png)
 
 How to use:
