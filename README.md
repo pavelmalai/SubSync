@@ -3,9 +3,10 @@ Added the option to add SubSync to the windows folder context menu
 ![alt text](https://github.com/pavelmalai/SubSync/blob/master/SubSyncFolderContext.png)
 
 How to use:
-1) Run the SubSync.exe (As Administrator)
-2) Use the keys 'r' and 'u' to register/unregister the SubSync to/from the context menu
-3) Right click on a folder that contains the movies you want the subtitles for, and click SubSync, this will download the subs for the selected folder, recursively
+1) Build the solution (make sure you have .NET 4.6.2 installed)
+2) Run the SubSync.exe (As Administrator) from the ...\SubSync\build\net462 folder
+3) Use the keys 'r' and 'u' to register/unregister the SubSync to/from the context menu
+4) Right click on a folder that contains the movies you want the subtitles for, and click SubSync, this will download the subs for the selected folder, recursively
 
 //TODO
 - Add the option to specify a different language than the default one
